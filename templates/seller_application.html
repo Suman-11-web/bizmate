@@ -1,0 +1,23 @@
+{% set app_shell = true %}
+{% extends "base.html" %}
+{% block title %}Seller application status — BizMate{% endblock %}
+{% block content %}
+<section class="application-status-page">
+  <p class="eyebrow"><span></span> SELLER ACCOUNT</p>
+  <h1>Your application</h1>
+  <p class="page-lead">{{ profile.business_name }} · Seller ID {{ current_user.id }}</p>
+  <article class="application-status-card">
+    <span class="application-status-icon">{% if status == 'pending' %}◷{% else %}✓{% endif %}</span>
+    <div><h2>{% if status == 'pending' %}Waiting for owner review{% else %}Seller access is active{% endif %}</h2>
+      <p>{% if status == 'pending' %}Your account remains locked while the BizMate owner reviews your seller details and plan payment.{% else %}Your account can access its seller workspace.{% endif %}</p>
+      {% if profile.requested_plan_name %}<small>Requested plan: {{ profile.requested_plan_name }} · {{ money(profile.requested_plan_price) }}/month</small>{% endif %}
+      {% if profile.requested_plan_price %}<p><span class="status-badge" data-status="{{ profile.payment_status }}">Payment {{ profile.payment_status|replace('_',' ')|title }}</span>{% if profile.payment_reference %} · UTR {{ profile.payment_reference }}{% endif %}</p>{% endif %}
+      {% if status == 'pending' and profile.requested_plan_price and profile.payment_status != 'verified' %}
+        {% if profile.payment_status == 'rejected' %}<p>The UTR was not verified. Check your UPI receipt and submit the correct reference below.</p>{% endif %}
+        <form class="application-payment-form" method="post" action="{{ url_for('seller_application') }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}"><label>UPI UTR / transaction reference<input name="payment_reference" minlength="8" maxlength="32" pattern="[A-Za-z0-9/-]{8,32}" value="{{ profile.payment_reference }}" required></label><button class="button button-small" type="submit">{{ 'Resubmit UTR' if profile.payment_status == 'rejected' else 'Update UTR' }} <span>→</span></button></form>
+      {% endif %}
+    </div>
+  </article>
+  <div class="application-status-actions"><a class="button button-small button-muted" href="{{ url_for('marketplace') }}">Visit marketplace <span>↗</span></a><form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}"><button class="button button-small button-quiet" type="submit">Sign out</button></form></div>
+</section>
+{% endblock %}

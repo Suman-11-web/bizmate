@@ -1,0 +1,40 @@
+{% set app_shell = true %}
+{% extends "base.html" %}
+{% block title %}Seller plans — BizMate owner{% endblock %}
+{% block content %}
+<section class="owner-plans-page">
+  <div class="dashboard-intro"><div><p class="eyebrow"><span></span> PLAN CONFIGURATION</p><h1>Seller plans</h1><p>Maintain the plans shown on seller registration. Keep listed benefits accurate and available.</p></div></div>
+  <div class="plan-layout">
+    <article class="panel plan-create-panel"><h2>Create a plan</h2><p>Use 100000 as the unlimited-products setting. Features appear on public registration.</p>
+      <form method="post" action="{{ url_for('owner_plans') }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+        <label>Plan name<input name="name" maxlength="60" required placeholder="e.g. Business"></label>
+        <label>Display label<input name="tier_label" maxlength="80" placeholder="e.g. GROWING STORE"></label>
+        <label>Description<textarea name="description" rows="3" maxlength="500" required></textarea></label>
+        <label>Included features <small>One per line, up to 8</small><textarea name="features" rows="5" maxlength="1200" placeholder="Active products\nInventory tools\nSales reports"></textarea></label>
+        <div class="form-two-col"><label>Price (₹)<input name="price" type="number" min="0" step="0.01" value="0.00" required></label><label>Billing<select name="billing_interval"><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label></div>
+        <label>Maximum active catalogue products<input name="product_limit" type="number" min="1" max="100000" required></label>
+        <label class="featured-plan-toggle"><input name="is_featured" type="checkbox" value="1"> Highlight as the popular plan</label>
+        <button class="button button-small" type="submit">Create plan <span>→</span></button>
+      </form>
+    </article>
+    <div class="plan-list">
+      {% if plans %}{% for plan in plans %}
+        <article class="panel plan-card">
+          <form method="post" action="{{ url_for('update_plan', plan_id=plan.id) }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="plan-card-heading"><div><span class="plan-id">PLAN {{ plan.id }}</span><span class="status-badge" data-status="{{ 'delivered' if plan.is_active else 'suspended' }}">{{ 'Available' if plan.is_active else 'Inactive' }}</span></div><small>{{ plan.seller_count }} active seller{{ '' if plan.seller_count == 1 else 's' }}</small></div>
+            <label>Plan name<input name="name" value="{{ plan.name }}" maxlength="60" required></label>
+            <label>Display label<input name="tier_label" value="{{ plan.tier_label }}" maxlength="80"></label>
+            <label>Description<textarea name="description" rows="2" maxlength="500" required>{{ plan.description }}</textarea></label>
+            <label>Included features <small>One per line, up to 8</small><textarea name="features" rows="4" maxlength="1200">{{ plan.features }}</textarea></label>
+            <div class="form-two-col"><label>Price (₹)<input name="price" type="number" min="0" step="0.01" value="{{ '%.2f'|format(plan.price_paise / 100) }}" required></label><label>Billing<select name="billing_interval"><option value="monthly" {{ 'selected' if plan.billing_interval == 'monthly' else '' }}>Monthly</option><option value="yearly" {{ 'selected' if plan.billing_interval == 'yearly' else '' }}>Yearly</option></select></label></div>
+            <label>Maximum active catalogue products<input name="product_limit" type="number" min="1" max="100000" value="{{ plan.product_limit }}" required></label>
+            <label class="featured-plan-toggle"><input name="is_featured" type="checkbox" value="1" {{ 'checked' if plan.is_featured else '' }}> Highlight as the popular plan</label>
+            <button class="button button-small" type="submit">Save changes</button>
+          </form>
+          <form method="post" action="{{ url_for('toggle_plan', plan_id=plan.id) }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}"><button class="table-text-button" type="submit">{{ 'Deactivate plan' if plan.is_active else 'Activate plan' }}</button></form>
+        </article>
+      {% endfor %}{% else %}<div class="empty-panel"><span>◇</span><h3>No plans configured</h3><p>Create a plan before approving seller applications.</p></div>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

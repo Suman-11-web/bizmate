@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}BizMate — the business workspace for independent sellers{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow"><span></span> A BUSINESS PLATFORM BUILT AROUND YOU</p>
+      <h1>Your business,<br><em>all in one place.</em></h1>
+      <p class="hero-lead">Bring products, inventory, orders, and business insights into one workspace. BizMate gives independent sellers the tools to run their store with confidence.</p>
+      <div class="hero-actions"><a class="button button-large" href="{{ url_for('register') }}">Apply to sell <span>→</span></a><a class="button button-quiet button-large" href="{{ url_for('marketplace') }}">Explore the marketplace</a></div>
+      <div class="hero-social-proof"><span class="secure-mark">✓</span><span><b>Seller accounts are reviewed</b><br>by the BizMate platform owner.</span></div>
+    </div>
+    <div class="hero-visual reveal delay-1" aria-label="BizMate seller workspace preview">
+      <div class="hero-orb orb-one"></div><div class="hero-orb orb-two"></div>
+      <div class="hero-card dashboard-preview">
+        <div class="preview-top"><span class="mini-brand"><span class="brand-mark"><i></i><i></i><i></i></span> BizMate</span><span class="preview-user">✓</span></div>
+        <div class="preview-main"><div><p>SELLER WORKSPACE</p><strong>Your business, in view</strong></div><span class="preview-more">•••</span></div>
+        <div class="preview-tabs"><span>Orders</span><span>Products</span><span>Insights</span></div>
+        <div class="preview-empty"><span>↗</span><b>Your store data, connected.</b><small>Sales and activity appear here as your business grows.</small></div>
+      </div>
+      <div class="floating-revenue"><span class="sparkle">♧</span><div><small>Access control</small><b>Owner approved</b></div></div>
+      <div class="floating-order"><span class="mini-packet">▧</span><div><b>Product catalogue</b><small>Managed by each seller</small></div><span class="check">✓</span></div>
+      <div class="hero-plant"><span></span><i></i><i></i><i></i><i></i></div>
+    </div>
+  </div>
+  <div class="trust-strip"><div class="container"><span>ONE WORKSPACE FOR THE DETAILS THAT MOVE A BUSINESS</span><div><b>Seller-led</b><small>your catalogue, your stock</small></div><div><b>Owner-managed</b><small>accounts and plans</small></div><div><b>Order-ready</b><small>from listing to delivery</small></div></div></div>
+</section>
+
+<section class="section benefits" id="how-it-works"><div class="container">
+  <div class="section-heading centered"><p class="eyebrow"><span></span> EVERYTHING IN SYNC</p><h2>Clear tools for <em>everyday work.</em></h2><p>Give each person the workspace they need to keep commerce moving.</p></div>
+  <div class="benefit-grid">
+    <article class="benefit-card"><span class="feature-icon icon-green">▧</span><h3>Products and stock</h3><p>Upload product photos, descriptions, pricing, and stock from your seller workspace.</p><a href="{{ url_for('register') }}">Apply as a seller <span>→</span></a></article>
+    <article class="benefit-card feature-card"><span class="feature-icon icon-purple">♧</span><h3>Reviewed seller access</h3><p>The platform owner reviews applications, activates accounts, and assigns a plan.</p><div class="mini-inventory"><span><i></i>Seller application</span><b>Owner reviewed</b><div><em></em></div></div></article>
+    <article class="benefit-card"><span class="feature-icon icon-orange">▢</span><h3>Orders that belong to you</h3><p>Each seller sees their own orders, customers, expenses, and catalogue performance.</p><a href="{{ url_for('login') }}">Sign in to your workspace <span>→</span></a></article>
+    <article class="benefit-card"><span class="feature-icon icon-blue">✦</span><h3>Useful business insights</h3><p>Ask questions against your own sales, expenses, stock, and order data.</p><a href="{{ url_for('register') }}">Get started <span>→</span></a></article>
+  </div>
+</div></section>
+
+<section class="section experiences" id="for-sellers"><div class="container">
+  <div class="section-heading"><p class="eyebrow"><span></span> TWO SIDES OF THE SAME PLATFORM</p><h2>Built for the people<br>behind <em>every transaction.</em></h2></div>
+  <div class="experience-grid">
+    <article class="experience-card seller-card"><div class="experience-copy"><span class="pill dark-pill">FOR SELLERS</span><h3>Bring your shop<br>online with care.</h3><p>Apply for a seller account, get reviewed, then manage your products and orders.</p><a class="button button-small" href="{{ url_for('register') }}">Apply to sell <span>→</span></a></div><div class="shop-illustration" aria-hidden="true"><div class="shop-awning"></div><div class="shop-body"><div class="shop-window"><i></i><i></i></div><div class="shop-door"></div></div><span class="shop-sign">YOUR SHOP</span><i class="shop-plant p1"></i><i class="shop-plant p2"></i></div></article>
+    <article class="experience-card buyer-card"><div class="experience-copy"><span class="pill purple-pill">FOR SHOPPERS</span><h3>Discover independent<br>businesses.</h3><p>Browse products published by active, approved BizMate sellers.</p><a class="button button-small button-purple" href="{{ url_for('marketplace') }}">Browse marketplace <span>→</span></a></div><div class="buyer-illustration" aria-hidden="true"><div class="buyer-bag">B</div><div class="buyer-person"><i></i><b></b><em></em></div><div class="buyer-spark s1">✦</div><div class="buyer-spark s2">✦</div></div></article>
+  </div>
+</div></section>
+
+{% if categories %}<section class="section categories-section"><div class="container">
+  <div class="row-heading"><div><p class="eyebrow"><span></span> SELLER-DEFINED CATEGORIES</p><h2>Browse what’s available.</h2></div><a class="text-link" href="{{ url_for('marketplace') }}">View marketplace <span>→</span></a></div>
+  <div class="category-grid">{% for item in categories %}<a class="category-card" href="{{ url_for('marketplace', category=item.category) }}"><span class="category-icon">✦</span><b>{{ item.category }}</b><small>Products from active sellers</small></a>{% endfor %}</div>
+</div></section>{% endif %}
+
+<section class="section featured-section"><div class="container">
+  <div class="row-heading"><div><p class="eyebrow"><span></span> ACTIVE SELLER CATALOGUE</p><h2>Available in the marketplace.</h2></div><a class="text-link" href="{{ url_for('marketplace') }}">Browse all <span>→</span></a></div>
+  {% if products %}<div class="product-grid landing-products">{% for product in products %}
+    <article class="product-card"><a class="product-image" href="{{ url_for('product_detail', product_id=product.id) }}"><img src="{{ url_for('static', filename=product.image_path) }}" alt="{{ product.name }}"></a><div class="product-info"><p>{{ product.category }} · {{ product.business_name }}</p><a href="{{ url_for('product_detail', product_id=product.id) }}"><h3>{{ product.name }}</h3></a><div class="product-meta"><b>{{ money(product.price_paise) }}</b><span>In stock · {{ product.inventory }}</span></div><form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="post" data-add-to-cart><input type="hidden" name="_csrf_token" value="{{ csrf_token }}"><button class="add-cart" type="submit">Add to cart <span>+</span></button></form></div></article>
+  {% endfor %}</div>{% else %}<div class="catalog-empty"><span>▧</span><h3>No published products yet</h3><p>Approved sellers will appear here when they publish products.</p><a class="text-link" href="{{ url_for('register') }}">Apply to become a seller →</a></div>{% endif %}
+</div></section>
+
+<section class="cta-section"><div class="container"><div class="cta-panel"><div class="cta-shape one"></div><div class="cta-shape two"></div><div><p class="eyebrow light-eyebrow"><span></span> GET STARTED WITH A REVIEWED ACCOUNT</p><h2>Set up your shop<br>the <em>right way.</em></h2><p>Submit your seller details. The platform owner will review your application and plan.</p></div><a class="button button-light button-large" href="{{ url_for('register') }}">Apply to sell <span>→</span></a></div></div></section>
+
+<footer class="site-footer"><div class="container footer-grid"><div><a class="brand footer-brand" href="{{ url_for('home') }}"><span class="brand-mark"><i></i><i></i><i></i></span><span>BizMate</span></a><p>Tools for independent<br>businesses and sellers.</p></div><div><b>Explore</b><a href="{{ url_for('marketplace') }}">Marketplace</a><a href="{{ url_for('register') }}">Sell with BizMate</a><a href="{{ url_for('login') }}">Account sign in</a></div><div><b>Platform</b><a href="{{ url_for('home') }}#how-it-works">How it works</a><a href="{{ url_for('home') }}#for-sellers">For sellers</a></div><div><b>Your account</b><p>Secure sign-in for approved sellers and platform owners.</p><a href="{{ url_for('login') }}">Go to sign in →</a></div></div><div class="container footer-bottom"><span>© {{ year }} BizMate</span><span>Independent business, connected.</span></div></footer>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% set app_shell = true %}
+{% extends "base.html" %}
+{% block title %}Seller dashboard — BizMate{% endblock %}
+{% block content %}
+<section class="dashboard-page">
+  <div class="dashboard-intro"><div><p class="eyebrow"><span></span> SELLER WORKSPACE</p><h1>{{ current_user.name|e }}, welcome back</h1><p>Live business activity for {{ seller_business }}.</p></div><div class="intro-actions"><span class="date-chip">{{ today }}</span><a class="button button-small" href="{{ url_for('marketplace') }}">View marketplace <span>↗</span></a></div></div>
+  <div class="stat-grid">
+    <article class="stat-card"><div class="stat-icon mint">↗</div><div class="stat-card-top"><span>Paid sales this month</span></div><strong>{{ money(stats.revenue) }}</strong><p>Settled orders only</p></article>
+    <article class="stat-card"><div class="stat-icon coral">◫</div><div class="stat-card-top"><span>Expenses this month</span></div><strong>{{ money(stats.expenses) }}</strong><p>From your expense records</p></article>
+    <article class="stat-card accent-stat"><div class="stat-icon dark">◉</div><div class="stat-card-top"><span>Sales less expenses</span></div><strong>{{ money(monthly_profit) }}</strong><p>Operating view, not tax advice</p></article>
+    <article class="stat-card"><div class="stat-icon blue">▧</div><div class="stat-card-top"><span>Current stock value</span></div><strong>{{ money(stats.stock_value) }}</strong><p>{{ stats.product_count }} active catalogue items</p></article>
+  </div>
+  <div class="operations-grid">
+    <article class="panel operation-panel"><div class="panel-heading"><div><h2>Low stock <span class="hint-dot">{{ low_stock|length }}</span></h2><p>Products at or below their own threshold</p></div><a href="{{ url_for('seller_products') }}">Manage stock →</a></div>
+      {% if low_stock %}<div class="stock-list">{% for product in low_stock %}<div class="stock-row"><img src="{{ url_for('static', filename=product.image_path) }}" alt="{{ product.name }}"><div><b>{{ product.name }}</b><small>{{ product.category }}</small></div><span class="stock-count {{ 'critical' if product.inventory == 0 else '' }}">{{ product.inventory }} left</span></div>{% endfor %}</div>{% else %}<div class="empty-panel compact-empty"><h3>No stock alerts</h3><p>Products needing attention will appear here.</p></div>{% endif %}
+    </article>
+    <article class="panel balances-panel"><div class="panel-heading"><div><h2>Orders to fulfil</h2><p>Not yet delivered or cancelled</p></div><a href="{{ url_for('seller_orders') }}">View orders →</a></div><div class="balance-list"><div><span class="avatar avatar-tint a1">▢</span><p><b>Open orders</b><small>Awaiting fulfilment</small></p><strong>{{ stats.pending_orders }}</strong></div></div><a class="button button-small" href="{{ url_for('seller_orders', status='pending') }}">Review orders <span>→</span></a></article>
+    <article class="panel recent-orders-panel"><div class="panel-heading"><div><h2>Recent orders</h2><p>Your latest seller orders</p></div><a href="{{ url_for('seller_orders') }}">View all →</a></div>
+      {% if recent_orders %}<div class="mini-orders">{% for order in recent_orders %}<div><p><b>{{ order.order_number }}</b><small>{{ order.created_at[:10] }} · {{ order.customer_name }}</small></p><strong>{{ money(order.total_paise) }}</strong><span class="status-badge" data-status="{{ order.status }}">{{ order.status|title }}</span></div>{% endfor %}</div>{% else %}<div class="empty-panel compact-empty"><h3>No orders yet</h3><p>Orders placed for your published products will show up here.</p></div>{% endif %}
+    </article>
+  </div>
+  <div class="analytics-grid" id="sales-overview">
+    <article class="panel sales-panel"><div class="panel-heading"><div><h2>Paid sales overview</h2><p>Last seven days</p></div></div><div class="sales-legend"><span><i></i> Paid sales</span><b>{{ money(sales_chart|sum(attribute='value')) }}</b></div><div class="large-chart"><div class="chart-y"><span>Scale</span><span> </span><span> </span><span>₹0</span></div><svg viewBox="0 0 600 100" preserveAspectRatio="none" role="img" aria-label="Paid sales over the last seven days"><path d="{{ chart_path }}" fill="none" stroke="#078b64" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg><div class="chart-x">{% for item in sales_chart %}<span>{{ item.day }}</span>{% endfor %}</div></div></article>
+    <article class="panel top-products-panel"><div class="panel-heading"><div><h2>Top products</h2><p>Units sold across your orders</p></div><a href="{{ url_for('seller_products') }}">Products →</a></div>
+      {% if top_products %}<div class="top-product-list">{% for product in top_products %}<div><img src="{{ url_for('static', filename=product.image_path) }}" alt="{{ product.name }}"><p><b>{{ product.name }}</b><small>{{ product.units_sold }} sold</small></p><strong>{{ product.units_sold }}</strong></div>{% endfor %}</div>{% else %}<div class="empty-panel compact-empty"><h3>No sales to rank</h3><p>Your product performance will appear after the first order.</p></div>{% endif %}
+    </article>
+  </div>
+  <div class="dashboard-bottom"><article class="insight-strip"><span class="insight-icon">✦</span><div><p>Business insights</p><h3>Ask about your actual business records.</h3><span>Get a quick summary of paid sales, logged expenses, low stock, or open orders.</span></div><a class="button button-small" href="{{ url_for('assistant_page') }}">Open insights <span>→</span></a></article><article class="quick-actions"><h3>Quick actions</h3><a href="{{ url_for('new_product') }}"><span>+</span> Add product</a><a href="{{ url_for('seller_orders') }}"><span>▢</span> Check orders</a><a href="{{ url_for('expenses') }}"><span>◫</span> Record expense</a></article></div>
+</section>
+{% endblock %}

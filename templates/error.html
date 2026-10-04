@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} — BizMate{% endblock %}
+{% block content %}
+<section class="not-found container"><span>{% if code == 403 %}⌑{% elif code == 413 %}↑{% else %}⌕{% endif %}</span><p class="eyebrow"><span></span> REQUEST NOT COMPLETED</p><h1>{{ code }}</h1><p>{{ message }}</p><div class="success-actions"><a class="button button-small" href="{{ url_for('home') }}">Go to BizMate home <span>→</span></a><a class="button button-small button-muted" href="{{ url_for('dashboard') }}">Open your workspace</a></div></section>
+{% endblock %}

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#078b64">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}BizMate — business tools for independent sellers{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20261004-2') }}">
+</head>
+<body class="{% if app_shell|default(false) %}app-shell-page{% else %}public-page{% endif %} {% block body_class %}{% endblock %}" data-role="{{ current_user.role if current_user else 'buyer' }}">
+  {% if app_shell|default(false) %}
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <a class="brand sidebar-brand" href="{{ url_for('dashboard') }}" aria-label="BizMate workspace"><span class="brand-mark"><i></i><i></i><i></i></span><span>BizMate</span></a>
+        {% if current_user and current_user.role == 'owner' %}
+          <p class="side-label">PLATFORM</p>
+          <nav class="side-nav" aria-label="Platform administration">
+            <a class="{{ 'active' if request.endpoint == 'owner_dashboard' else '' }}" href="{{ url_for('owner_dashboard') }}"><span class="nav-glyph">⌂</span>Overview</a>
+            <a class="{{ 'active' if request.endpoint == 'owner_sellers' else '' }}" href="{{ url_for('owner_sellers') }}"><span class="nav-glyph">♧</span>Sellers</a>
+            <a class="{{ 'active' if request.endpoint in ['owner_plans','update_plan','toggle_plan'] else '' }}" href="{{ url_for('owner_plans') }}"><span class="nav-glyph">◇</span>Plans</a>
+            <a href="{{ url_for('marketplace') }}"><span class="nav-glyph">⌁</span>Marketplace</a>
+          </nav>
+          <div class="sidebar-upgrade"><span>●</span><strong>Platform owner</strong><small>Seller approvals and plan control</small></div>
+        {% else %}
+          <p class="side-label">MY BUSINESS</p>
+          <nav class="side-nav" aria-label="Seller workspace">
+            <a class="{{ 'active' if request.endpoint == 'seller_dashboard' else '' }}" href="{{ url_for('seller_dashboard') }}"><span class="nav-glyph">⌂</span>Overview</a>
+            <a class="{{ 'active' if request.endpoint in ['seller_products','new_product','edit_product'] else '' }}" href="{{ url_for('seller_products') }}"><span class="nav-glyph">▧</span>Products</a>
+            <a class="{{ 'active' if request.endpoint in ['seller_orders','update_order'] else '' }}" href="{{ url_for('seller_orders') }}"><span class="nav-glyph">▢</span>Orders</a>
+            <a class="{{ 'active' if request.endpoint in ['expenses','delete_expense'] else '' }}" href="{{ url_for('expenses') }}"><span class="nav-glyph">◫</span>Expenses</a>
+            <a class="{{ 'active' if request.endpoint == 'customers' else '' }}" href="{{ url_for('customers') }}"><span class="nav-glyph">♧</span>Customers</a>
+            <a class="{{ 'active' if request.endpoint == 'reports' else '' }}" href="{{ url_for('reports') }}"><span class="nav-glyph">▥</span>Reports</a>
+            <a class="{{ 'active' if request.endpoint in ['assistant_page','assistant_reply'] else '' }}" href="{{ url_for('assistant_page') }}"><span class="nav-glyph">✦</span>Business insights</a>
+          </nav>
+          <div class="sidebar-upgrade"><span>↗</span><strong>{{ seller_business }}</strong><small>Seller workspace</small></div>
+        {% endif %}
+      </aside>
+      <main class="app-main">
+        <header class="app-topbar">
+          <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" data-menu-toggle>☰</button>
+          <label class="global-search"><span>⌕</span><input type="search" value="{{ request.args.get('q', '') }}" placeholder="Search products, sellers, or pages" data-global-search></label>
+          <div class="top-actions">
+            <a class="icon-button" href="{{ url_for('marketplace') }}" aria-label="Open marketplace">⌁</a>
+            <span class="profile-name">{{ current_user.name if current_user else '' }}</span>
+            <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}"><button class="logout-button" type="submit">Sign out</button></form>
+          </div>
+        </header>
+        <div class="app-content">
+  {% else %}
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="{{ url_for('home') }}" aria-label="BizMate home"><span class="brand-mark"><i></i><i></i><i></i></span><span>BizMate</span></a>
+        <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-nav-toggle><span></span><span></span></button>
+        <nav class="site-nav" data-site-nav>
+          <a href="{{ url_for('home') }}#how-it-works">How it works</a>
+          <a href="{{ url_for('marketplace') }}">Marketplace</a>
+          <a href="{{ url_for('register') }}">Sell with BizMate</a>
+        </nav>
+        <div class="nav-actions">
+          <a class="text-action" href="{{ url_for('cart') }}">Cart ({{ cart_count }})</a>
+          {% if current_user %}<a class="button button-small" href="{{ url_for('dashboard') }}">My workspace <span>→</span></a>
+          {% else %}<a class="text-action" href="{{ url_for('login') }}">Sign in</a><a class="button button-small" href="{{ url_for('register') }}">Open a seller account <span>→</span></a>{% endif %}
+        </div>
+      </div>
+    </header>
+    <main>
+  {% endif %}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}<div class="flash-stack" role="status">{% for category, message in messages %}<div class="flash-message {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+
+  {% if app_shell|default(false) %}
+        </div>
+      </main>
+    </div>
+  {% else %}</main>{% endif %}
+  <div class="toast" role="status" aria-live="polite" data-toast><span class="toast-icon">✓</span><span data-toast-message>Saved</span></div>
+  <script src="{{ url_for('static', filename='js/app.js', v='20261004-2') }}"></script>
+</body>
+</html>

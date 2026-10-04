@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}Application received — BizMate{% endblock %}
+{% block content %}
+<section class="cart-empty application-success registration-success"><div class="success-orbit"><span>✓</span></div><p class="eyebrow"><span></span> APPLICATION RECEIVED</p><h1>{{ business_name }} is <em>in review.</em></h1><p>Your request for the {{ requested_plan }} plan is pending. {% if payment_required %}The UTR you submitted still needs to be verified by the BizMate owner; access is not activated just by submitting a reference.{% else %}The BizMate owner will review and approve your free-plan seller account.{% endif %} Sign in later to check the application status.</p><div class="success-actions"><a class="button button-large" href="{{ url_for('login') }}">Go to sign in <span>→</span></a><a class="button button-quiet button-large" href="{{ url_for('home') }}">Back to home</a></div></section>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Seller plans and registration — BizMate{% endblock %}
+{% block content %}
+<section class="seller-register-page container">
+  <header class="register-heading">
+    <p class="eyebrow"><span></span> SELL WITH BIZMATE</p>
+    <h1>Choose a plan for <em>your shop.</em></h1>
+    <p>Pick a seller plan, submit your business details, and wait for the platform owner to review your account.</p>
+  </header>
+
+  <form class="seller-register-form" method="post" action="{{ url_for('register') }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+    <fieldset class="seller-plan-grid">
+      <legend class="sr-only">Choose a seller plan</legend>
+      {% for plan in plans %}
+        <label class="seller-plan-card {{ 'featured' if plan.is_featured else '' }} {{ 'selected' if selected_plan_id == plan.id else '' }}">
+          {% if plan.is_featured and plan.badge_text|default('') %}<span class="plan-popular">{{ plan.badge_text }}</span>{% elif plan.is_featured %}<span class="plan-popular">MOST POPULAR</span>{% endif %}
+          <input type="radio" name="requested_plan_id" value="{{ plan.id }}" data-plan-price="{{ plan.price_paise }}" {{ 'checked' if selected_plan_id == plan.id else '' }} required>
+          <span class="plan-tier">{{ plan.tier_label or plan.name|upper }}</span>
+          <span class="plan-name">{{ plan.name }}</span>
+          <span class="plan-price"><b>{{ money(plan.price_paise) }}</b><small>/{{ plan.billing_interval|replace('ly', '') }}</small></span>
+          <span class="plan-description">{{ plan.description }}</span>
+          <span class="plan-features">
+            {% for feature in plan.features.splitlines() %}<span><i aria-hidden="true">✓</i>{{ feature }}</span>{% endfor %}
+            {% if not plan.features %}<span><i aria-hidden="true">✓</i>Seller tools included</span>{% endif %}
+          </span>
+          <span class="plan-choice">Select {{ plan.name }}</span>
+        </label>
+      {% else %}
+        <div class="empty-panel"><h3>No seller plans are available</h3><p>Please contact BizMate support before registering.</p></div>
+      {% endfor %}
+    </fieldset>
+
+    <div class="register-details-grid">
+      <section class="register-payment-card" aria-labelledby="payment-heading">
+        <p class="eyebrow"><span></span> PAID PLAN PAYMENT</p>
+        <h2 id="payment-heading">Scan the BizMate UPI QR</h2>
+        <p>For a paid plan, pay the displayed monthly amount, then enter the UTR/reference from your UPI app. An owner checks the payment before approving the plan.</p>
+        {% if qr_available %}
+          <img class="bizmate-qr" src="{{ url_for('static', filename='images/qr.jpeg') }}" alt="BizMate UPI payment QR code">
+        {% else %}
+          <div class="qr-missing" role="status"><span>▦</span><b>QR image will appear here</b><small>Save it at <code>static/images/qr.jpeg</code> and refresh.</small></div>
+        {% endif %}
+        <label class="utr-field">UPI UTR / transaction reference
+          <input name="payment_reference" type="text" maxlength="32" minlength="8" pattern="[A-Za-z0-9/-]{8,32}" autocomplete="off" placeholder="Enter the payment reference" data-payment-reference>
+          <small data-payment-help>Required only when you choose a paid plan. Use 8–32 letters or numbers exactly as shown in your UPI app.</small>
+        </label>
+        <div class="payment-review-note"><b>Manual verification</b><span>Submitting a UTR is a payment claim, not proof by itself. BizMate will activate a paid plan only after its owner verifies the transaction.</span></div>
+      </section>
+
+      <section class="register-form-card" aria-labelledby="account-heading">
+        <p class="eyebrow"><span></span> SELLER APPLICATION</p>
+        <h2 id="account-heading">Create your seller account</h2>
+        <p>Your account stays pending until an owner reviews the application and plan.</p>
+        <div class="form-two-col">
+          <label>Your name<input name="name" maxlength="100" autocomplete="name" required value="{{ request.form.get('name', '') }}"></label>
+          <label>Business name<input name="business_name" maxlength="120" autocomplete="organization" required value="{{ request.form.get('business_name', '') }}"></label>
+        </div>
+        <label>Email address<input name="email" type="email" maxlength="254" autocomplete="email" required value="{{ request.form.get('email', '') }}"></label>
+        <label>Business registration number <small class="optional-label">Optional</small><input name="registration_number" maxlength="80" placeholder="GSTIN or business registration" value="{{ request.form.get('registration_number', '') }}"></label>
+        <div class="form-two-col">
+          <label>Password<input name="password" type="password" autocomplete="new-password" minlength="12" required><small class="field-help">12+ characters, including letters and numbers.</small></label>
+          <label>Confirm password<input name="password_confirmation" type="password" autocomplete="new-password" minlength="12" required></label>
+        </div>
+        <button class="button button-large register-submit" type="submit">Submit seller application <span>→</span></button>
+        <p class="auth-foot">Already applied? <a href="{{ url_for('login') }}">Sign in to check your status</a></p>
+      </section>
+    </div>
+  </form>
+  <p class="plan-scope-note">Current plan enforcement: active product limits, seller workspace access, and manual UPI reference review. Recurring billing and advanced services such as GST PDF invoices, staff logins, predictive AI, priority placement, and dedicated support are not enabled in this build.</p>
+</section>
+{% endblock %}

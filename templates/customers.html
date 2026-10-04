@@ -1,0 +1,7 @@
+{% set app_shell = true %}{% extends "base.html" %}
+{% block title %}Customers — BizMate{% endblock %}
+{% block content %}
+<section class="orders-page"><div class="dashboard-intro"><div><p class="eyebrow"><span></span> YOUR CUSTOMER RECORDS</p><h1>Customers</h1><p>Customer records are derived from orders placed with {{ seller_business }}.</p></div></div>
+  <article class="panel orders-list-panel">{% if customers %}<div class="orders-list-top customer-list-top"><span>CUSTOMER</span><span>EMAIL</span><span>ORDERS</span><span>ORDER VALUE</span><span>LAST ORDER</span></div>{% for customer in customers %}<div class="order-list-row customer-list-row"><div><span class="avatar avatar-tint a{{ (loop.index0 % 4) + 1 }}">{{ customer.customer_name[:2]|upper }}</span><p><b>{{ customer.customer_name }}</b></p></div><div><a href="mailto:{{ customer.customer_email }}">{{ customer.customer_email }}</a></div><div><b>{{ customer.order_count }}</b></div><div><b>{{ money(customer.total_spend_paise) }}</b></div><div>{{ customer.last_order[:10] }}</div></div>{% endfor %}{% else %}<div class="empty-panel"><span>♧</span><h3>No customer records yet</h3><p>Customer details are created from orders placed for your products.</p><a class="button button-small" href="{{ url_for('seller_products') }}">View catalogue <span>→</span></a></div>{% endif %}</article>
+</section>
+{% endblock %}

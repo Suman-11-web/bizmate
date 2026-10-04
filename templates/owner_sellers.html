@@ -1,0 +1,39 @@
+{% set app_shell = true %}
+{% extends "base.html" %}
+{% block title %}Seller accounts — BizMate owner{% endblock %}
+{% block content %}
+<section class="owner-sellers-page">
+  <div class="dashboard-intro"><div><p class="eyebrow"><span></span> SELLER ACCESS CONTROL</p><h1>Seller accounts</h1><p>Review seller IDs, UTR claims, plan requests, and account access.</p></div><div class="intro-actions"><a class="button button-small button-muted" href="{{ url_for('owner_plans') }}">Manage plans <span>→</span></a></div></div>
+  <form class="table-search owner-search" action="{{ url_for('owner_sellers') }}" method="get"><span>⌕</span><input type="hidden" name="status" value="{{ active_status }}"><input type="search" name="q" value="{{ query }}" placeholder="Find by seller, business, email, or ID"><button type="submit">Search</button></form>
+  <nav class="orders-tabs" aria-label="Filter seller accounts"><a class="{{ 'active' if active_status == 'all' else '' }}" href="{{ url_for('owner_sellers', q=query) }}">All</a>{% for item in ['pending','active','rejected','suspended'] %}<a class="{{ 'active' if active_status == item else '' }}" href="{{ url_for('owner_sellers', status=item, q=query) }}">{{ item|title }}</a>{% endfor %}</nav>
+  <article class="panel owner-sellers-panel">
+    {% if sellers %}<div class="owner-table-wrap"><table class="owner-table seller-admin-table">
+      <thead><tr><th>BUSINESS / SELLER</th><th>SELLER ID</th><th>STATUS</th><th>REQUESTED / ACTIVE PLAN</th><th>PAYMENT / UTR</th><th>CONTROL</th></tr></thead>
+      <tbody>{% for seller in sellers %}<tr>
+        <td><b>{{ seller.business_name }}</b><small>{{ seller.name }} · {{ seller.email }}</small><small>{{ seller.registration_number or 'No business registration supplied' }}</small></td>
+        <td>#{{ seller.id }}<small>Applied {{ seller.created_at[:10] }}</small></td>
+        <td><span class="status-badge" data-status="{{ seller.status }}">{{ seller.status|title }}</span></td>
+        <td><b>{{ seller.plan_name or seller.requested_plan or 'Unassigned' }}</b>{% if seller.status == 'pending' and seller.requested_plan_price is not none %}<small>{{ money(seller.requested_plan_price) }}/month requested</small>{% endif %}</td>
+        <td class="payment-reference-cell">
+          {% if seller.requested_plan_price %}
+            <span class="status-badge" data-status="{{ seller.payment_status }}">{{ seller.payment_status|replace('_',' ')|title }}</span>
+            <span class="payment-ref">{{ seller.payment_reference or 'UTR not submitted' }}</span>
+            {% if seller.payment_status == 'submitted' and seller.payment_plan_id == seller.requested_plan_id and seller.status == 'pending' %}
+              <form class="payment-review-form" method="post" action="{{ url_for('review_seller_payment', account_id=seller.id) }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}"><button name="action" value="verify" type="submit">Verify UTR</button><button class="reject-payment" name="action" value="reject" type="submit">Reject</button></form>
+            {% elif seller.payment_status == 'verified' %}<small>Verified {{ seller.payment_verified_at[:10] if seller.payment_verified_at else '' }}</small>{% endif %}
+          {% else %}<span class="status-badge" data-status="verified">No payment due</span>{% endif %}
+        </td>
+        <td class="seller-control-cell"><div class="seller-control-actions">
+          {% if active_plans %}
+            <form class="owner-review-form" method="post" action="{{ url_for('review_seller', account_id=seller.id) }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}"><select name="plan_id" aria-label="Assign plan to {{ seller.business_name }}" required>{% for plan in active_plans %}<option value="{{ plan.id }}" {{ 'selected' if seller.plan_name == plan.name or (not seller.plan_name and seller.requested_plan == plan.name) else '' }}>{{ plan.name }} · {{ money(plan.price_paise) }}</option>{% endfor %}</select><button class="table-text-button" type="submit" name="action" value="approve">{{ 'Approve / assign' if seller.status in ['pending','active'] else 'Approve account' }}</button></form>
+          {% elif seller.status in ['pending','suspended'] %}<a class="text-link" href="{{ url_for('owner_plans') }}">Create an active plan →</a>{% endif %}
+          {% if seller.status == 'active' %}<form method="post" action="{{ url_for('review_seller', account_id=seller.id) }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}"><button class="table-danger-button" type="submit" name="action" value="suspend">Suspend access</button></form>
+          {% elif seller.status == 'suspended' %}<form method="post" action="{{ url_for('review_seller', account_id=seller.id) }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}"><button class="table-text-button" type="submit" name="action" value="reactivate">Reactivate</button></form>
+          {% elif seller.status == 'pending' %}<form method="post" action="{{ url_for('review_seller', account_id=seller.id) }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}"><button class="table-danger-button" type="submit" name="action" value="reject">Reject application</button></form>{% endif %}
+        </div></td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<div class="empty-panel"><span>♧</span><h3>{% if query %}No seller accounts match “{{ query }}”{% else %}No {{ active_status if active_status != 'all' else '' }} seller accounts{% endif %}</h3><p>Seller applications and account changes will appear here.</p>{% if query %}<a class="button button-small" href="{{ url_for('owner_sellers', status=active_status) }}">Clear search</a>{% endif %}</div>{% endif %}
+  </article>
+</section>
+{% endblock %}
